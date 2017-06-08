@@ -7,6 +7,8 @@ import com.lambdaworks.redis.KeyValue;
 import com.lambdaworks.redis.RedisCommandTimeoutException;
 import com.lambdaworks.redis.api.sync.RedisCommands;
 import git.mq_redis.redis.RedisClientUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,19 +27,21 @@ import java.util.concurrent.Executors;
  */
 public class MsgConsumer {
 
+    private static Logger logger = LoggerFactory.getLogger(MsgConsumer.class);
+
     public static void main(String[] args) throws IOException, NoSuchMethodException, IllegalAccessException, InstantiationException {
 
         //①绑定事件类型和事件实体  即绑定队列名和队列元素
-        Map<MsgType,List<AbsMsg>> msgTypeMap = new HashMap<>();
+        Map<MsgType, List<AbsMsg>> msgTypeMap = new HashMap<>();
         // 扫描com.msg.msginstance下的包，获取消息实例
         ImmutableSet<ClassPath.ClassInfo> msgInstances = ClassPath.from(ClassLoader.getSystemClassLoader())
                 .getTopLevelClasses("git.mq_redis.msg.msginstance");
         for (ClassPath.ClassInfo msgInstance : msgInstances) {
-            AbsMsg absMsg = (AbsMsg)msgInstance.load().newInstance();
+            AbsMsg absMsg = (AbsMsg) msgInstance.load().newInstance();
             MsgType msgType = absMsg.listenType();
             List<AbsMsg> orDefault = msgTypeMap.getOrDefault(msgType, new ArrayList<>());
             orDefault.add(absMsg);
-            msgTypeMap.put(msgType,orDefault);
+            msgTypeMap.put(msgType, orDefault);
         }
 
         // 获取目前的队列个数
@@ -50,11 +54,13 @@ public class MsgConsumer {
                 while (true) {
                     KeyValue jsonValue;
                     try {
-                        jsonValue = sync.brpop(10, msgType.toString());
-                    }catch (RedisCommandTimeoutException e){
+                        jsonValue = sync.brpop(2, msgType.toString());
+                    } catch (RedisCommandTimeoutException e) { // 在指定时间从队列获取不到值，会抛出该异常
+                        logger.error("msgqueue is empty" );
                         continue;
                     }
-                    if(jsonValue==null) continue;
+                    // 按照单进程单线程的逻辑，这一步应该是不会为空的，
+                    if (jsonValue == null) continue;
                     // 将jsonValue转为Msg对象 ：Json->Map->AbsMsg(多态)
                     Map objMap = (Map) JSONObject.parse(jsonValue.value.toString()); //
                     // ①现在有队列名，需要再外层将队列名与事件做绑定
