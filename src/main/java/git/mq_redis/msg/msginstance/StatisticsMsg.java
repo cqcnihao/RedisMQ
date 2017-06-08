@@ -11,6 +11,10 @@ import java.util.Map;
  */
 public class StatisticsMsg extends AbsMsg {
 
+    public enum Key{
+
+    }
+
     public StatisticsMsg() {
 
     }
