@@ -16,7 +16,10 @@ public class TestMsgPush {
     public static void main(String[] args) {
         int i = 0;
         while (i++ < 30) {
-            MsgPuser.push(MsgType.MakeFriend, new MakeFriendMsg(ImmutableMap.builder().put("gender", 2).put("fromuser", "用户" + i).put("touser", "大波浪美女").put("age", 18).build()));
+            MsgPuser.push(MsgType.MakeFriend, new MakeFriendMsg(ImmutableMap.builder()
+                    .put(MakeFriendMsg.Key.fromuser.toString(), "用户" + i)
+                    .put(MakeFriendMsg.Key.touser.toString(), "大波浪美女")
+                    .build()));
 
             MsgPuser.push(MsgType.Statistics, new StatisticsMsg(ImmutableMap.builder().put("requesttime", new Date()).build()));
         }

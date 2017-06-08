@@ -12,7 +12,7 @@ public class TestMsgExtention {
 
     public static void main(String[] args) {
 
-        MakeFriendMsg makeFriendMsg = new MakeFriendMsg(ImmutableMap.builder().put(MakeFriendMsg.Key.createtime, new Date())
+        MakeFriendMsg makeFriendMsg = new MakeFriendMsg(ImmutableMap.builder()
                 .put(MakeFriendMsg.Key.fromuser, "张三")
                 .put(MakeFriendMsg.Key.touser, "李四")
                 .build());

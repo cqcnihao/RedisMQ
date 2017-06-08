@@ -26,7 +26,7 @@ public class RedisClientUtils {
                 lock.writeLock().lock();
                 if (connection == null) {
                     // 新建客户端
-                    RedisClient redisClient = RedisClient.create("redis://auth@host:6379");
+                    RedisClient redisClient = RedisClient.create("redis://Pbx199299@47.93.9.228:6379");
                     connection = redisClient.connect();// 连接
                 }
             } catch (Exception e) {

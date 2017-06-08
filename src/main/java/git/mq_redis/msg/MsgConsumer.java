@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.ClassPath;
 import com.lambdaworks.redis.KeyValue;
+import com.lambdaworks.redis.RedisCommandTimeoutException;
 import com.lambdaworks.redis.api.sync.RedisCommands;
 import git.mq_redis.redis.RedisClientUtils;
 
@@ -42,14 +43,18 @@ public class MsgConsumer {
         // 获取目前的队列个数
         int msgListLength = MsgType.values().length;
         ExecutorService executorService = Executors.newFixedThreadPool(msgListLength);
-
         // 开启多线程同时从这些消息队列中取
         for (MsgType msgType : MsgType.values()) {
             executorService.execute(() -> {
                 RedisCommands sync = RedisClientUtils.getSingleRedisConnection().sync();
                 while (true) {
-                    KeyValue jsonValue = sync.brpop(0, msgType.toString());
-                    if(jsonValue == null) continue;
+                    KeyValue jsonValue;
+                    try {
+                        jsonValue = sync.brpop(10, msgType.toString());
+                    }catch (RedisCommandTimeoutException e){
+                        continue;
+                    }
+                    if(jsonValue==null) continue;
                     // 将jsonValue转为Msg对象 ：Json->Map->AbsMsg(多态)
                     Map objMap = (Map) JSONObject.parse(jsonValue.value.toString()); //
                     // ①现在有队列名，需要再外层将队列名与事件做绑定

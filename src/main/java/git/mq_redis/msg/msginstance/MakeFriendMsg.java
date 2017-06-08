@@ -15,7 +15,6 @@ public class MakeFriendMsg extends AbsMsg {
     public enum Key{
         fromuser,
         touser,
-        createtime,
     }
 
     public MakeFriendMsg() {
@@ -28,7 +27,8 @@ public class MakeFriendMsg extends AbsMsg {
 
     public void deal(Map jsonMap) {
         //
-        System.out.println(jsonMap.get(Key.fromuser) + "想和" + jsonMap.get(Key.touser) + "成为好友" + "时间：" + jsonMap.get(Key.createtime));
+        System.out.println(jsonMap.get(Key.fromuser.toString()) + "想和" + jsonMap.get(Key.touser.toString())
+                + "成为好友" );
 
     }
 
