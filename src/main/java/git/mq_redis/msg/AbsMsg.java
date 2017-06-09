@@ -32,7 +32,7 @@ public abstract class AbsMsg {
         return String.valueOf(JSON.toJSON(jsonMap));
     }
 
-    //3 要求子类消息需绑定对应事件类型，即属于哪个List；
+    //3 要求子类消息需绑定对应事件类型，即属于哪个redis的List；
     public abstract MsgType listenType();
 
     public abstract void deal(Map jsonMap);
