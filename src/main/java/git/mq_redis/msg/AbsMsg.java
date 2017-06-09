@@ -17,7 +17,6 @@ public abstract class AbsMsg {
     protected Map<String,Object> jsonMap;
 
     // 子类要通过无参构造器来发射创建实例，而子类的无参构造器调用时会默认调用父类的无参构造器
-    // 所以父类中提供一个无参构造器来供自类反射创建时，不会报错
     public AbsMsg(){
 
     }
